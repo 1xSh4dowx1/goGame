@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Du\\\\Faculdade\\\\5Semestre\\\\TDS\\\\ProjetoGo\\\\goDudu\" -Recurse -Force)",
+      "Bash(Select-Object FullName)",
+      "Bash(./gradlew test *)",
+      "Bash(Get-ChildItem *)",
+      "Bash(Select-Object FullName, PSIsContainer)",
+      "Bash(Sort-Object FullName)",
+      "Bash(ConvertTo-Json)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Du\\\\Faculdade\\\\5Semestre\\\\TDS\\\\ProjetoGo\\\\goDudu\" -Recurse -Force | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Du\\\\Faculdade\\\\5Semestre\\\\TDS\\\\ProjetoGo\\\\goDudu\\\\src\" -Recurse -File | Where-Object {$_.Extension -match '\\\\.\\(kt|kts|md|txt\\)$'} | Sort-Object FullName | ForEach-Object { $_.FullName })"
+    ]
+  }
+}

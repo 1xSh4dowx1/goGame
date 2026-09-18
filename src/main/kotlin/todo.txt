@@ -1,0 +1,111 @@
+──────────────────────────────────────────────────────
+Core  (src/main/kotlin/model/core/)
+──────────────────────────────────────────────────────
+
+[ ] Point.kt — adicionar função neighbors(): Set<Point>
+      Retorna os 4 pontos adjacentes (N, S, E, O) dentro dos limites do
+      tabuleiro. É necessária para calcular liberties em GoString e para
+      a lógica de captura em GameState. Discutir se recebe o tamanho do
+      tabuleiro como parâmetro ou se essa filtragem fica em Board.
+
+[ ] Board.kt — discutir se deve expor neighbors(point) filtrados
+      Alternativa a Point.neighbors(): deixar em Board para que Board
+      seja o único sítio que conhece o tamanho e os limites.
+
+[ ] Stone.kt — decidir encoding definitivo: ordinal vs bitwise
+      Atualmente usa Stone.ordinal (0, 1, 2). Há código comentado com
+      encoding 0b00/0b01/0b10. Se a ordem do enum mudar o armazenamento
+      fica corrompido. Usar toInt()/toStone() com when explícito é mais
+      robusto — decidir e aplicar de forma consistente.
+
+──────────────────────────────────────────────────────
+Game  (src/main/kotlin/model/game/)
+──────────────────────────────────────────────────────
+
+[ ] GoString.kt — implementar os 3 métodos com TODO()
+      withoutLiberty(point): devolve cópia sem esse ponto nas liberties
+      withLiberty(point):    devolve cópia com esse ponto nas liberties
+      mergedWith(other):     une stones + liberties, remove as stones da
+                             união das liberties (pedras não são liberdades)
+      → 8 testes em GoStringTest.kt já existem e estão a falhar
+
+[ ] GameState.kt — implementar de raiz (ficheiro vazio)
+      Estado completo de uma partida:
+        · tabuleiro atual (Board)
+        · jogador da vez (Player)
+        · historial de posições (para regra do Ko — usar Zobrist)
+        · prisioneiros capturados por cada jogador
+        · último movimento (para detectar dois Passes consecutivos)
+      Operação principal: applyMove(move: Move): MoveResult
+        · validar movimento (suicídio, Ko)
+        · colocar pedra, calcular grupos adjacentes
+        · remover grupos sem liberties (captura)
+        · devolver MoveResult
+
+[ ] MoveResult.kt — implementar de raiz (ficheiro vazio)
+      Resultado de applyMove. Pode ser sealed class:
+        · Valid(newState: GameState)
+        · InvalidSuicide
+        · InvalidKo
+        · GameOver(reason: ...) — após Resign ou dois Passes
+
+[ ] Score.kt — implementar de raiz (ficheiro vazio)
+      Contagem de pontos no fim da partida:
+        · Contar prisioneiros de cada jogador
+        · Calcular território (pontos vazios rodeados por um único jogador)
+        · Regra de pontuação a definir: Chinese (area) vs Japanese (territory)
+        · Discutir como representar o resultado (data class com black/white)
+
+[ ] Zobrist.kt — implementar de raiz (ficheiro vazio)
+      Hash de Zobrist para detectar repetição de posições (regra do Ko):
+        · Tabela de números aleatórios por (Point, Stone)
+        · Hash incremental ao aplicar cada movimento
+        · Historial de hashes em GameState para verificar Ko
+
+──────────────────────────────────────────────────────
+TUI   (src/main/kotlin/tui/)
+──────────────────────────────────────────────────────
+
+[ ] Output.kt — implementar os 4 métodos com TODO()
+      Player.symbol():  devolve "B" ou "W" (depende de BLACK_SYMBOL /
+                        WHITE_SYMBOL já definidos)
+      turnShow():       mostra o jogador da vez e os seus prisioneiros
+      gameShow():       mostra tabuleiro + turno + pontuação parcial
+      scoreShow():      mostra resultado final da partida
+
+[ ] Output.kt — melhorar printBoard()
+      Actualmente usa "+", "B", "W". Discutir usar símbolos Unicode
+      (●, ○, ·) para melhor visualização no terminal.
+
+[ ] Commands.kt — implementar a classe Commands (está vazia)
+      Mapear CommandsOpt (NEW, PLAY, SHOW, RESIGN, HELP) para acções:
+        NEW    → criar novo GameState
+        PLAY   → ler Point do utilizador, chamar applyMove
+        SHOW   → chamar gameShow()
+        RESIGN → chamar applyMove(Move.Resign)
+        HELP   → listar comandos disponíveis
+
+[ ] Input.kt — integrar leitura de Point para o comando PLAY
+      Falta função askPoint(board): Point que leia coordenadas
+      (ex: "C4" ou "3 4") e valide que estão dentro do tabuleiro.
+
+──────────────────────────────────────────────────────
+Main  (src/main/kotlin/Main.kt)
+──────────────────────────────────────────────────────
+
+[ ] Substituir a demo actual por um game loop real
+      1. Pedir tamanho do tabuleiro (já existe askBoardSize())
+      2. Criar GameState inicial
+      3. Loop: gameShow() → ler comando → executar → tratar MoveResult
+      4. Terminar quando GameOver (dois Passes ou Resign) e mostrar Score
+
+──────────────────────────────────────────────────────
+Testes  (src/test/kotlin/)
+──────────────────────────────────────────────────────
+
+[ ] GoStringTest.kt — 8 testes já escritos, desbloqueiam ao implementar GoString
+[ ] Criar GameStateTest.kt após implementar GameState
+[ ] Criar ZobristTest.kt para verificar colisões e incrementalidade do hash
+[ ] Criar ScoreTest.kt com cenários simples de contagem de território
+
+========================================================
